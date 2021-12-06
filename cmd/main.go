@@ -9,9 +9,10 @@ import (
 
 func main() {
 	filepath := ""
-	config, err := config.LoadConfig(filepath)
+	cfg, err := config.LoadConfig(filepath)
 	if err != nil {
 		log.Fatal("config exist error!")
 	}
-	proxyserver.NewProxyServer(config)
+	server := proxyserver.NewProxyServer(cfg)
+	server.StartServer()
 }
