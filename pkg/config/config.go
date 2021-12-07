@@ -5,6 +5,6 @@ type Config struct {
 
 func LoadConfig(configFile string) (*Config, error) {
 
-	ss
+	//test
 	return nil, nil
 }
