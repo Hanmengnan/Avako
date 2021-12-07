@@ -3,6 +3,7 @@ package proxyserver
 import (
 	"Avako/pkg/config"
 	"Avako/pkg/loadBalancer"
+	"fmt"
 	"log"
 
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"net/url"
 )
 
+var Num int //记录调取负载均衡的次数
 type ProxyServer struct {
 	Host     string //监听地址和端口
 	Port     string
@@ -29,7 +31,8 @@ func NewProxyServer(*config.Config) *ProxyServer {
 	ser := ProxyServer{
 		Host: "0.0.0.0",
 		Port: "8888",
-		Balancer: loadBalancer.TimeStampRandomBalancer{
+		//在此更改策略，支持TimeStampRandomBalancer.RandomBalance.HashBalance
+		Balancer: loadBalancer.HashBalance{
 			Servers: serverAr,
 		},
 	}
@@ -48,7 +51,9 @@ func (s *ProxyServer) StartServer() {
 func (s *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.RemoteAddr + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
 	//获取负载均衡地址
-	remoteServer, err := s.Balancer.DoBalance()
+	Num++
+	fmt.Printf("第%d次调用\n", Num)
+	remoteServer, err := s.Balancer.DoBalance(r.RemoteAddr) //r.RemoteAddr作为标识，相同的r.RemoteAddr会代理到同一个IP
 	if err != nil {
 		log.Println("")
 	}

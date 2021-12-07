@@ -7,5 +7,5 @@ type Server struct {
 }
 
 type Balancer interface {
-	DoBalance(...string) (*Server, error)
+	DoBalance(key ...string) (*Server, error)
 }
