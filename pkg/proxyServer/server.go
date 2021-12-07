@@ -2,7 +2,7 @@ package proxyserver
 
 import (
 	"Avako/pkg/config"
-	"Avako/pkg/loadbalancer"
+	"Avako/pkg/loadBalancer"
 	"log"
 
 	"net/http"
@@ -13,7 +13,7 @@ import (
 type ProxyServer struct {
 	Host     string
 	Port     string
-	Balancer loadbalancer.Balancer
+	Balancer loadBalancer.Balancer
 }
 
 func NewProxyServer(*config.Config) *ProxyServer {

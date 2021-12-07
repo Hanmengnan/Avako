@@ -1,4 +1,4 @@
-package loadbalancer
+package loadBalancer
 
 type Server struct {
 	Host   string
