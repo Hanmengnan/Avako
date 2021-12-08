@@ -7,6 +7,8 @@ import (
 
 type RandomBalance struct {
 	Servers []*Server
+	Index   *int64
+	Weight  *int64
 }
 
 func (balancer RandomBalance) DoBalance(key ...string) (*Server, error) {

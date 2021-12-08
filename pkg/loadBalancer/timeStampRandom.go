@@ -7,6 +7,8 @@ import (
 
 type TimeStampRandomBalancer struct {
 	Servers []*Server
+	Index   *int64
+	Weight  *int64
 }
 
 func (balancer TimeStampRandomBalancer) DoBalance(key ...string) (*Server, error) {

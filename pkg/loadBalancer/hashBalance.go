@@ -9,6 +9,8 @@ import (
 
 type HashBalance struct {
 	Servers []*Server
+	Index   *int64
+	Weight  *int64
 }
 
 func (balancer HashBalance) DoBalance(key ...string) (*Server, error) {
