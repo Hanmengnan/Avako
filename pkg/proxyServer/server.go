@@ -27,13 +27,18 @@ func NewProxyServer(*config.Config) *ProxyServer {
 	s2 := loadBalancer.Server{
 		Host:   "127.0.0.1",
 		Port:   "8002",
-		Weight: 5,
+		Weight: 2,
 	}
+	var serverAr = []*loadBalancer.Server{&s1, &s2}
 	ser := ProxyServer{
 		Host: "0.0.0.0",
 		Port: "8888",
 		//在此更改策略，支持TimeStampRandomBalancer.RandomBalance.HashBalance
-		Balancer: loadBalancer.NewWeightRoundRobin([]*loadBalancer.Server{&s1, &s2}, &Num, &Weight),
+		Balancer: loadBalancer.ByRequestBalancer{
+			Servers: serverAr,
+			Index:   &Num,
+			Weight:  &Weight,
+		},
 	}
 	return &ser
 }
@@ -49,8 +54,14 @@ func (s *ProxyServer) StartServer() {
 
 func (s *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.RemoteAddr + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
+	//提取url参数serverid，http://127.0.0.1:8888/?serverid=1
+	serverid := ""
+	r.ParseForm()
+	if len(r.Form["serverid"]) > 0 {
+		serverid = r.Form["serverid"][0]
+	}
 	//获取负载均衡地址
-	remoteServer, err := s.Balancer.DoBalance(r.RemoteAddr) //r.RemoteAddr作为标识，相同的r.RemoteAddr会代理到同一个IP
+	remoteServer, err := s.Balancer.DoBalance(r.RemoteAddr, serverid) //r.RemoteAddr作为标识，相同的r.RemoteAddr会代理到同一个IP
 	if err != nil {
 		log.Println("")
 	}
