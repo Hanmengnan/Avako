@@ -27,18 +27,13 @@ func NewProxyServer(*config.Config) *ProxyServer {
 	s2 := loadBalancer.Server{
 		Host:   "127.0.0.1",
 		Port:   "8002",
-		Weight: 2,
+		Weight: 5,
 	}
-	var serverAr = []*loadBalancer.Server{&s1, &s2}
 	ser := ProxyServer{
 		Host: "0.0.0.0",
 		Port: "8888",
 		//在此更改策略，支持TimeStampRandomBalancer.RandomBalance.HashBalance
-		Balancer: loadBalancer.WeightRoundRobin{
-			Servers: serverAr,
-			Index:   &Num,
-			Weight:  &Weight,
-		},
+		Balancer: loadBalancer.NewWeightRoundRobin([]*loadBalancer.Server{&s1, &s2}, &Num, &Weight),
 	}
 	return &ser
 }

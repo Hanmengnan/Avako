@@ -11,6 +11,13 @@ type TimeStampRandomBalancer struct {
 	Weight  *int64
 }
 
+func NewTimeStampRandomBalancer(s []*Server, i *int64, w *int64) *TimeStampRandomBalancer {
+	return &TimeStampRandomBalancer{
+		Servers: s,
+		Index:   i,
+		Weight:  w,
+	}
+}
 func (balancer TimeStampRandomBalancer) DoBalance(key ...string) (*Server, error) {
 	serverNum := len(balancer.Servers)
 	if serverNum == 0 {

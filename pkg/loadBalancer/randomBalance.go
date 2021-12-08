@@ -11,6 +11,13 @@ type RandomBalance struct {
 	Weight  *int64
 }
 
+func NewRandomBalance(s []*Server, i *int64, w *int64) *RandomBalance {
+	return &RandomBalance{
+		Servers: s,
+		Index:   i,
+		Weight:  w,
+	}
+}
 func (balancer RandomBalance) DoBalance(key ...string) (*Server, error) {
 	serverNum := len(balancer.Servers)
 	if serverNum == 0 {

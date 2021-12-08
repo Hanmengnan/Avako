@@ -13,6 +13,13 @@ type HashBalance struct {
 	Weight  *int64
 }
 
+func NewHashBalance(s []*Server, i *int64, w *int64) *HashBalance {
+	return &HashBalance{
+		Servers: s,
+		Index:   i,
+		Weight:  w,
+	}
+}
 func (balancer HashBalance) DoBalance(key ...string) (*Server, error) {
 	serverNum := len(balancer.Servers)
 	var defKey string = fmt.Sprintf("%d", rand.Int())

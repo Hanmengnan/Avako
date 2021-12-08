@@ -10,6 +10,13 @@ type WeightRoundRobin struct {
 	Weight  *int64
 }
 
+func NewWeightRoundRobin(s []*Server, i *int64, w *int64) *WeightRoundRobin {
+	return &WeightRoundRobin{
+		Servers: s,
+		Index:   i,
+		Weight:  w,
+	}
+}
 func (balancer WeightRoundRobin) DoBalance(key ...string) (*Server, error) {
 	serverNum := len(balancer.Servers)
 	if serverNum == 0 {
