@@ -9,20 +9,16 @@ import (
 
 type HashBalance struct {
 	Servers []*Server
-	Index   *int64
-	Weight  *int64
+	Index   int64
+	Weight  int64
 }
 
-func NewHashBalance(s []*Server, i *int64, w *int64) *HashBalance {
-	return &HashBalance{
-		Servers: s,
-		Index:   i,
-		Weight:  w,
-	}
+func (balancer *HashBalance) NewBalancer(s []*Server, i int64, w int64) {
+	balancer.Servers = s
 }
-func (balancer HashBalance) DoBalance(key ...string) (*Server, error) {
+func (balancer *HashBalance) DoBalance(key ...string) (*Server, error) {
 	serverNum := len(balancer.Servers)
-	var defKey string = fmt.Sprintf("%d", rand.Int())
+	defKey := fmt.Sprintf("%d", rand.Int())
 	if len(key) > 0 {
 		defKey = key[0]
 	}

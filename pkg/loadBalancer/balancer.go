@@ -7,9 +7,6 @@ type Server struct {
 }
 
 type Balancer interface {
+	NewBalancer(s []Server, i int64, w int64)
 	DoBalance(key ...string) (*Server, error)
 }
-
-/* type NewBalancer interface {
-	NewBalance(Servers []*Server, Index int64, Weight int64) (*Balancer, error)
-} */

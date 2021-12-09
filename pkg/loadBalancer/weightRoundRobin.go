@@ -6,18 +6,14 @@ import (
 
 type WeightRoundRobin struct {
 	Servers []*Server
-	Index   *int64
-	Weight  *int64
+	Index   int64
+	Weight  int64
 }
 
-func NewWeightRoundRobin(s []*Server, i *int64, w *int64) *WeightRoundRobin {
-	return &WeightRoundRobin{
-		Servers: s,
-		Index:   i,
-		Weight:  w,
-	}
+func (balancer *WeightRoundRobin) NewBalancer(s []*Server, i int64, w int64) {
+	balancer.Servers = s
 }
-func (balancer WeightRoundRobin) DoBalance(key ...string) (*Server, error) {
+func (balancer *WeightRoundRobin) DoBalance(key ...string) (*Server, error) {
 	serverNum := len(balancer.Servers)
 	if serverNum == 0 {
 		return nil, errors.New("no instance found")
@@ -26,21 +22,21 @@ func (balancer WeightRoundRobin) DoBalance(key ...string) (*Server, error) {
 
 	return s, nil
 }
-func (p *WeightRoundRobin) GetInst() *Server {
-	gcd := getGCD(p.Servers)
+func (balancer *WeightRoundRobin) GetInst() *Server {
+	gcd := getGCD(balancer.Servers)
 	for {
-		*p.Index = (*p.Index + 1) % int64(len(p.Servers))
-		if *p.Index == 0 {
-			*p.Weight = *p.Weight - gcd
-			if *p.Weight <= 0 {
-				*p.Weight = getMaxWeight(p.Servers)
-				if *p.Weight == 0 {
+		balancer.Index = (balancer.Index + 1) % int64(len(balancer.Servers))
+		if balancer.Index == 0 {
+			balancer.Weight = balancer.Weight - gcd
+			if balancer.Weight <= 0 {
+				balancer.Weight = getMaxWeight(balancer.Servers)
+				if balancer.Weight == 0 {
 					return &Server{}
 				}
 			}
 		}
-		if p.Servers[*p.Index].Weight >= *p.Weight {
-			return p.Servers[*p.Index]
+		if balancer.Servers[balancer.Index].Weight >= balancer.Weight {
+			return balancer.Servers[balancer.Index]
 		}
 	}
 }
