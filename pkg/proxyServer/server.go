@@ -17,22 +17,25 @@ type ProxyServer struct {
 	Balancer loadBalancer.Balancer //interface
 }
 
-func NewProxyServer(*config.Config) *ProxyServer {
+func NewProxyServer(cfg *config.Config, indx int) *ProxyServer {
 	// Servers that truly provide service
-	s1 := loadBalancer.Server{
-		Host: "127.0.0.1",
-		Port: "8001",
-	}
-	s2 := loadBalancer.Server{
-		Host: "127.0.0.1",
-		Port: "8002",
-	}
+	//s1 := loadBalancer.Server{
+	//	Host: "127.0.0.1",
+	//	Port: "8001",
+	//}
+	//s2 := loadBalancer.Server{
+	//	Host: "127.0.0.1",
+	//	Port: "8002",
+	//}
+
 	// declare array of pointer about interface that are exposed to users.
-	var serverAr = []*loadBalancer.Server{&s1, &s2}
+	serverAr := cfg.Servers
+	//var serverAr = []*loadBalancer.Server{&s1, &s2}
+
 	// construct a ProxyServer
 	ser := ProxyServer{
-		Host: "0.0.0.0",
-		Port: "8888",
+		Host: cfg.Nginx[indx].Ip,
+		Port: cfg.Nginx[indx].Port,
 		// 为什么给接口赋值特定的类
 		Balancer: loadBalancer.TimeStampRandomBalancer{
 			Servers: serverAr,
@@ -75,11 +78,11 @@ func (s *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Send request to the true server.
 	proxy.ServeHTTP(w, r)
 
-	var wg sync.waitgroup
-	wg.add(1)
-	go func() {
-		s.StartServer()
-		wg.Done()
-	}()
-	wg.wait()
+	//var wg sync.waitgroup
+	//wg.add(1)
+	//go func() {
+	//	s.StartServer()
+	//	wg.Done()
+	//}()
+	//wg.wait()
 }

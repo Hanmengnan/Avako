@@ -16,10 +16,10 @@ func main() {
 	}
 
 	wg := sync.WaitGroup{}
-	wg.Add()
-	for {
+	wg.Add(len(cfg.Nginx))
+	for i := 0; i < len(cfg.Nginx); i++ {
 		go func() {
-			server := proxyserver.NewProxyServer(cfg)
+			server := proxyserver.NewProxyServer(cfg, i)
 			server.StartServer(&wg)
 		}()
 	}
