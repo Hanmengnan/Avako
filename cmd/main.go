@@ -3,6 +3,7 @@ package main
 import (
 	config "Avako/pkg/config"
 	proxyserver "Avako/pkg/proxyServer"
+	"sync"
 
 	"log"
 )
@@ -13,6 +14,17 @@ func main() {
 	if err != nil {
 		log.Fatal("config exist error!")
 	}
-	server := proxyserver.NewProxyServer(cfg)
-	server.StartServer()
+
+	wg := sync.WaitGroup{}
+	wg.Add()
+	for {
+		go func() {
+			server := proxyserver.NewProxyServer(cfg)
+			server.StartServer(&wg)
+		}()
+	}
+	wg.Wait()
+
+	//server := proxyserver.NewProxyServer(cfg)
+	//server.StartServer()
 }
