@@ -5,13 +5,11 @@ import (
 	"testing"
 )
 
-// import "testing"
-
-// func TestLoadConfig(t *testing.T) {
-// 	configFile := "../config/config.json"
-// 	LoadConfig(configFile)
-// }
-
 func TestLoadConfig(t *testing.T) {
-	log.Print("")
+	configFile := "../../config/config.json"
+	config, err := LoadConfig(configFile)
+	if err != nil {
+		return
+	}
+	log.Println(config)
 }
