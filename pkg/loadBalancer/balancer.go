@@ -3,9 +3,10 @@ package loadBalancer
 type Server struct {
 	Host   string
 	Port   string
-	Weight string
+	Weight int64
 }
 
 type Balancer interface {
-	DoBalance(...string) (*Server, error)
+	NewBalancer(s []Server, i int64, w int64)
+	DoBalance(key ...string) (*Server, error)
 }

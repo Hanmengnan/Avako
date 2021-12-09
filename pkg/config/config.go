@@ -7,13 +7,14 @@ import (
 )
 
 type Proxyserver struct {
-	Ip        string
+	Host      string
 	Port      string
 	Algorithm string
 }
 type Server struct {
-	Ip   string
-	Port string
+	Host   string
+	Port   string
+	Weight int64
 }
 
 type Config struct {
