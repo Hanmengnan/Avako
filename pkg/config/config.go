@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-type Proxyserver struct {
+type ProxyServer struct {
 	Host      string
 	Port      string
 	Algorithm string
@@ -18,12 +18,11 @@ type Server struct {
 }
 
 type Config struct {
-	Nginx   []Proxyserver
-	Servers []Server
+	ProxyServers []ProxyServer
+	Servers      []Server
 }
 
 func LoadConfig(configFile string) (*Config, error) {
-
 	jsonFile, err := os.ReadFile(configFile)
 	if err != nil {
 		log.Fatalln(err)
