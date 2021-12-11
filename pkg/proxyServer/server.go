@@ -18,28 +18,42 @@ type ProxyServer struct {
 }
 
 func NewProxyServer(cfg *config.Config, indx int) *ProxyServer {
-	// Servers that truly provide service
-	//s1 := loadBalancer.Server{
-	//	Host: "127.0.0.1",
-	//	Port: "8001",
-	//}
-	//s2 := loadBalancer.Server{
-	//	Host: "127.0.0.1",
-	//	Port: "8002",
-	//}
 
 	// declare array of pointer about interface that are exposed to users.
-	serverAr := cfg.Servers
+	servers := make([]*loadBalancer.Server, 0)
+	for _, item := range cfg.Servers {
+		servers = append(servers, &loadBalancer.Server{
+			Host:   item.Host,
+			Port:   item.Port,
+			Weight: item.Weight,
+		})
+	}
 	//var serverAr = []*loadBalancer.Server{&s1, &s2}
 
+	// 如何给接口赋值？
+	var balancer loadBalancer.Balancer
+	switch cfg.Nginx[indx].Algorithm {
+	case "TimeStampRandomBalancer":
+		balancer = new(loadBalancer.TimeStampRandomBalancer)
+	case "HashBalance":
+		balancer = new(loadBalancer.HashBalance)
+	case "ByRequestBalancer":
+		balancer = new(loadBalancer.ByRequestBalancer)
+	case "RandomBalance":
+		balancer = new(loadBalancer.RandomBalance)
+	case "WeightRoundRobin":
+		balancer = new(loadBalancer.WeightRoundRobin)
+	}
+
+	balancer.NewBalancer(servers, 0, 0)
+
 	// construct a ProxyServer
+
 	ser := ProxyServer{
-		Host: cfg.Nginx[indx].Ip,
+		Host: cfg.Nginx[indx].Host,
 		Port: cfg.Nginx[indx].Port,
 		// 为什么给接口赋值特定的类
-		Balancer: loadBalancer.TimeStampRandomBalancer{
-			Servers: serverAr,
-		},
+		Balancer: balancer,
 	}
 	return &ser
 }

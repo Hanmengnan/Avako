@@ -25,6 +25,4 @@ func main() {
 	}
 	wg.Wait()
 
-	//server := proxyserver.NewProxyServer(cfg)
-	//server.StartServer()
 }
