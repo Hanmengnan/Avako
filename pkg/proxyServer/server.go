@@ -17,8 +17,7 @@ type ProxyServer struct {
 	Balancer loadBalancer.Balancer //interface
 }
 
-func NewProxyServer(cfg *config.Config, indx int) *ProxyServer {
-
+func NewProxyServer(cfg *config.Config, index int) *ProxyServer {
 	// declare array of pointer about interface that are exposed to users.
 	servers := make([]*loadBalancer.Server, 0)
 	for _, item := range cfg.Servers {
@@ -28,11 +27,8 @@ func NewProxyServer(cfg *config.Config, indx int) *ProxyServer {
 			Weight: item.Weight,
 		})
 	}
-	//var serverAr = []*loadBalancer.Server{&s1, &s2}
-
-	// 如何给接口赋值？
 	var balancer loadBalancer.Balancer
-	switch cfg.Nginx[indx].Algorithm {
+	switch cfg.ProxyServers[index].Algorithm {
 	case "TimeStampRandomBalancer":
 		balancer = new(loadBalancer.TimeStampRandomBalancer)
 	case "HashBalance":
@@ -50,8 +46,8 @@ func NewProxyServer(cfg *config.Config, indx int) *ProxyServer {
 	// construct a ProxyServer
 
 	ser := ProxyServer{
-		Host: cfg.Nginx[indx].Host,
-		Port: cfg.Nginx[indx].Port,
+		Host: cfg.ProxyServers[index].Host,
+		Port: cfg.ProxyServers[index].Port,
 		// 为什么给接口赋值特定的类
 		Balancer: balancer,
 	}
@@ -65,13 +61,16 @@ func (s *ProxyServer) StartServer(wg *sync.WaitGroup) {
 		Handler: s,
 	}
 	log.Printf("Listening on %s", server.Addr)
-	server.ListenAndServe()
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	wg.Done()
 }
 
 func (s *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Variable w means response from server.
-
 	log.Println(r.RemoteAddr + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
 	// Get server that truly provides service by loadBalancer
 	remoteServer, err := s.Balancer.DoBalance()
@@ -92,11 +91,4 @@ func (s *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Send request to the true server.
 	proxy.ServeHTTP(w, r)
 
-	//var wg sync.waitgroup
-	//wg.add(1)
-	//go func() {
-	//	s.StartServer()
-	//	wg.Done()
-	//}()
-	//wg.wait()
 }

@@ -9,20 +9,18 @@ import (
 )
 
 func main() {
-	filepath := ""
+	filepath := "./config/config.json"
 	cfg, err := config.LoadConfig(filepath)
 	if err != nil {
-		log.Fatal("config exist error!")
+		log.Fatal("Config file don't exist!")
 	}
-
-	wg := sync.WaitGroup{}
-	wg.Add(len(cfg.Nginx))
-	for i := 0; i < len(cfg.Nginx); i++ {
-		go func() {
-			server := proxyserver.NewProxyServer(cfg, i)
+	var wg sync.WaitGroup
+	wg.Add(len(cfg.ProxyServers))
+	for i := 0; i < len(cfg.ProxyServers); i++ {
+		go func(index int) {
+			server := proxyserver.NewProxyServer(cfg, index)
 			server.StartServer(&wg)
-		}()
+		}(i)
 	}
 	wg.Wait()
-
 }

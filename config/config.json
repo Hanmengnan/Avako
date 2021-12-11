@@ -1,21 +1,36 @@
 {
-  "Nginx": [
+  "ProxyServers": [
     {
-      "Host": "10.10.0.0",
-      "Port": "80",
-      "Algorithm": "fair"
+      "Host": "127.0.0.1",
+      "Port": "8000",
+      "Algorithm": "HashBalance"
+    },
+    {
+      "Host": "127.0.0.1",
+      "Port": "8005",
+      "Algorithm": "TimeStampRandomBalancer"
+    },
+    {
+      "Host": "127.0.0.1",
+      "Port": "8008",
+      "Algorithm": "RandomBalance"
     }
   ],
   "Servers": [
     {
-      "Host": "192.168.10.0",
-      "Port": "8080",
-      "Weight": 1
+      "Host": "39.107.91.78",
+      "Port": "8001",
+      "Weight": 2
     },
     {
-      "Host": "192.168.5.5",
-      "Port": "8082",
+      "Host": "39.107.91.78",
+      "Port": "8002",
       "Weight": 2
+    },
+    {
+      "Host": "39.107.91.78",
+      "Port": "8003",
+      "Weight": 3
     }
   ]
 }
