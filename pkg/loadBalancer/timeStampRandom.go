@@ -11,10 +11,10 @@ type TimeStampRandomBalancer struct {
 	Weight  int64
 }
 
-func (balancer *TimeStampRandomBalancer) NewBalancer(s []*Server, i int64, w int64) {
+func (balancer *TimeStampRandomBalancer) NewBalancer(s []*Server) {
 	balancer.Servers = s
 }
-func (balancer *TimeStampRandomBalancer) DoBalance(key ...string) (*Server, error) {
+func (balancer *TimeStampRandomBalancer) DoBalance(...string) (*Server, error) {
 	serverNum := len(balancer.Servers)
 	if serverNum == 0 {
 		return nil, errors.New("no instance found")

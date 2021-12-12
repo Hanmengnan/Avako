@@ -3,9 +3,8 @@ package main
 import (
 	config "Avako/pkg/config"
 	proxyserver "Avako/pkg/proxyServer"
-	"sync"
-
 	"log"
+	"sync"
 )
 
 func main() {
@@ -14,11 +13,17 @@ func main() {
 	if err != nil {
 		log.Fatal("Config file don't exist!")
 	}
+	start(cfg)
+}
+
+func start(cfg *config.Config) {
 	var wg sync.WaitGroup
 	wg.Add(len(cfg.ProxyServers))
 	for i := 0; i < len(cfg.ProxyServers); i++ {
+		proxyServerCfg := cfg.ProxyServers[i]
+		servers := cfg.Servers
 		go func(index int) {
-			server := proxyserver.NewProxyServer(cfg, index)
+			server := proxyserver.NewProxyServer(&proxyServerCfg, servers)
 			server.StartServer(&wg)
 		}(i)
 	}

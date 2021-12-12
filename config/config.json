@@ -7,6 +7,11 @@
     },
     {
       "Host": "127.0.0.1",
+      "Port": "8001",
+      "Algorithm": "ByRequestBalancer"
+    },
+    {
+      "Host": "127.0.0.1",
       "Port": "8005",
       "Algorithm": "TimeStampRandomBalancer"
     },

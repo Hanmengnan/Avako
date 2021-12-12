@@ -13,7 +13,7 @@ type HashBalance struct {
 	Weight  int64
 }
 
-func (balancer *HashBalance) NewBalancer(s []*Server, i int64, w int64) {
+func (balancer *HashBalance) NewBalancer(s []*Server) {
 	balancer.Servers = s
 }
 func (balancer *HashBalance) DoBalance(key ...string) (*Server, error) {

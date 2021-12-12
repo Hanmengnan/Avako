@@ -1,7 +1,6 @@
 package proxyserver
 
 import (
-	"Avako/pkg/config"
 	"Avako/pkg/loadBalancer"
 	"log"
 	"sync"
@@ -12,15 +11,16 @@ import (
 )
 
 type ProxyServer struct {
-	Host     string //监听地址和端口
-	Port     string
-	Balancer loadBalancer.Balancer //interface
+	Host      string
+	Port      string
+	Algorithm string
+	Balancer  loadBalancer.Balancer
 }
 
-func NewProxyServer(cfg *config.Config, index int) *ProxyServer {
+func NewProxyServer(ps *ProxyServer, ss []loadBalancer.Server) *ProxyServer {
 	// declare array of pointer about interface that are exposed to users.
 	servers := make([]*loadBalancer.Server, 0)
-	for _, item := range cfg.Servers {
+	for _, item := range ss {
 		servers = append(servers, &loadBalancer.Server{
 			Host:   item.Host,
 			Port:   item.Port,
@@ -28,7 +28,7 @@ func NewProxyServer(cfg *config.Config, index int) *ProxyServer {
 		})
 	}
 	var balancer loadBalancer.Balancer
-	switch cfg.ProxyServers[index].Algorithm {
+	switch ps.Algorithm {
 	case "TimeStampRandomBalancer":
 		balancer = new(loadBalancer.TimeStampRandomBalancer)
 	case "HashBalance":
@@ -41,20 +41,16 @@ func NewProxyServer(cfg *config.Config, index int) *ProxyServer {
 		balancer = new(loadBalancer.WeightRoundRobin)
 	}
 
-	balancer.NewBalancer(servers, 0, 0)
-
+	balancer.NewBalancer(servers)
 	// construct a ProxyServer
-
 	ser := ProxyServer{
-		Host: cfg.ProxyServers[index].Host,
-		Port: cfg.ProxyServers[index].Port,
-		// 为什么给接口赋值特定的类
+		Host:     ps.Host,
+		Port:     ps.Port,
 		Balancer: balancer,
 	}
 	return &ser
 }
 
-// method of ProxyServer
 func (s *ProxyServer) StartServer(wg *sync.WaitGroup) {
 	server := http.Server{
 		Addr:    s.Host + ":" + s.Port,
@@ -73,13 +69,28 @@ func (s *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Variable w means response from server.
 	log.Println(r.RemoteAddr + " " + r.Method + " " + r.URL.String() + " " + r.Proto + " " + r.UserAgent())
 	// Get server that truly provides service by loadBalancer
-	remoteServer, err := s.Balancer.DoBalance()
-	if err != nil {
-		log.Println("")
+	var remoteServer *loadBalancer.Server
+	var err error
+	switch s.Balancer.(type) {
+	case *loadBalancer.ByRequestBalancer:
+		_ = r.ParseForm()
+		serverId := ""
+		if len(r.Form["serverId"]) > 0 {
+			serverId = r.Form["serverId"][0]
+		}
+		remoteServer, err = s.Balancer.DoBalance(r.RemoteAddr, serverId)
+	default:
+		remoteServer, err = s.Balancer.DoBalance()
+		if err != nil {
+			log.Println(err)
+			return
+		}
 	}
+
 	remoteURL, err := url.Parse("http://" + remoteServer.Host + ":" + remoteServer.Port)
 	if err != nil {
 		log.Fatalln(err)
+		return
 	}
 	log.Printf("forward to: " + remoteURL.Host)
 	// Return a new ReverseProxy that routes
@@ -90,5 +101,4 @@ func (s *ProxyServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Host = remoteServer.Host + ":" + remoteServer.Port
 	// Send request to the true server.
 	proxy.ServeHTTP(w, r)
-
 }

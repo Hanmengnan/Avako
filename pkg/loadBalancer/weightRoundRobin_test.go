@@ -20,7 +20,7 @@ func TestWeightRoundRobin_NewBalancer(t *testing.T) {
 			Weight: item.Weight,
 		})
 	}
-	balancer.NewBalancer(servers, 0, 0)
+	balancer.NewBalancer(servers)
 }
 
 func TestWeightRoundRobin_DoBalance(t *testing.T) {
@@ -37,6 +37,6 @@ func TestWeightRoundRobin_DoBalance(t *testing.T) {
 			Weight: item.Weight,
 		})
 	}
-	balancer.NewBalancer(servers, 0, 0)
+	balancer.NewBalancer(servers)
 	log.Println(balancer.DoBalance())
 }

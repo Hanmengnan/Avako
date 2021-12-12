@@ -1,25 +1,16 @@
 package config
 
 import (
+	"Avako/pkg/loadBalancer"
+	"Avako/pkg/proxyServer"
 	"encoding/json"
 	"log"
 	"os"
 )
 
-type ProxyServer struct {
-	Host      string
-	Port      string
-	Algorithm string
-}
-type Server struct {
-	Host   string
-	Port   string
-	Weight int64
-}
-
 type Config struct {
-	ProxyServers []ProxyServer
-	Servers      []Server
+	ProxyServers []proxyserver.ProxyServer
+	Servers      []loadBalancer.Server
 }
 
 func LoadConfig(configFile string) (*Config, error) {
