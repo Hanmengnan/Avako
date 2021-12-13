@@ -21,7 +21,7 @@ func (balancer *ByRequestBalancer) DoBalance(key ...string) (*Server, error) {
 	id, err := strconv.Atoi(key[1])
 	log.Println("choose sever", id)
 	if err != nil {
-		log.Println("wrong with extracting server id")
+		log.Println(err)
 	}
 	if serverNum == 0 {
 		return nil, errors.New("no instance found")

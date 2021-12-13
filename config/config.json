@@ -1,41 +1,51 @@
 {
   "ProxyServers": [
     {
-      "Host": "127.0.0.1",
-      "Port": "8000",
+      "Host": "0.0.0.0",
+      "Port": "8001",
       "Algorithm": "HashBalance"
     },
     {
-      "Host": "127.0.0.1",
-      "Port": "8001",
-      "Algorithm": "ByRequestBalancer"
+      "Host": "0.0.0.0",
+      "Port": "8002",
+      "Algorithm": "RandomBalance"
     },
     {
-      "Host": "127.0.0.1",
-      "Port": "8005",
+      "Host": "0.0.0.0",
+      "Port": "8003",
       "Algorithm": "TimeStampRandomBalancer"
     },
     {
-      "Host": "127.0.0.1",
-      "Port": "8008",
-      "Algorithm": "RandomBalance"
+      "Host": "0.0.0.0",
+      "Port": "8004",
+      "Algorithm": "WeightRoundRobin"
+    },
+    {
+      "Host": "0.0.0.0",
+      "Port": "8005",
+      "Algorithm": "ByRequestBalancer"
     }
   ],
   "Servers": [
     {
+      "Host": "81.70.78.119",
+      "Port": "8001",
+      "Weight": 3
+    },
+    {
+      "Host": "81.70.78.119",
+      "Port": "8002",
+      "Weight": 3
+    },
+    {
       "Host": "39.107.91.78",
       "Port": "8001",
-      "Weight": 2
+      "Weight": 1
     },
     {
       "Host": "39.107.91.78",
       "Port": "8002",
-      "Weight": 2
-    },
-    {
-      "Host": "39.107.91.78",
-      "Port": "8003",
-      "Weight": 3
+      "Weight": 1
     }
   ]
 }
